@@ -30,59 +30,82 @@ func (f *Function) Ptr() C.IM3Function {
 }
 
 func (f *Function) Call(args ...interface{}) ([](interface{}), error) {
-	length := len(args)
-	cArray := C.malloc(C.size_t(length) * C.size_t(unsafe.Sizeof(uintptr(0))))
-	c := (*[1<<30 - 1]unsafe.Pointer)(cArray)[:length:length]
+	argsLength := len(args)
+
+	// cArgs
+	cArgs := C.malloc(C.size_t(argsLength) * C.size_t(unsafe.Sizeof(uintptr(0))))
+	cArgsSlice := (*[1<<30 - 1]unsafe.Pointer)(cArgs)[:argsLength:argsLength]
 	for i, v := range args {
-		a, ok := v.(int)
+		cArgsSlice[i] = nil
+
+		iVal, ok := v.(int)
 		if ok {
-			cVal := C.int(a)
-			c[i] = unsafe.Pointer(&cVal)
+			cVal := C.int(iVal)
+			cArgsSlice[i] = unsafe.Pointer(&cVal)
+			continue
+		}
+
+		f32Val, ok := v.(float32)
+		if ok {
+			cVal := C.float(f32Val)
+			cArgsSlice[i] = unsafe.Pointer(&cVal)
+			continue
+		}
+
+		f64Val, ok := v.(float64)
+		if ok {
+			cVal := C.float(f64Val)
+			cArgsSlice[i] = unsafe.Pointer(&cVal)
 			continue
 		}
 	}
-	cArrayPtr := (*unsafe.Pointer)(cArray)
+	cArgsPtr := (*unsafe.Pointer)(cArgs)
 
-	result := C.m3_Call(f.Ptr(), C.uint(length), cArrayPtr)
+	// call function
+	result := C.m3_Call(f.Ptr(), C.uint(argsLength), cArgsPtr)
 	if result != nil {
 		return nil, errors.New("error when calling function")
 	}
 
-	fooArray := C.malloc(C.size_t(f.ptr.funcType.numRets) * C.size_t(unsafe.Sizeof(uintptr(0))))
-	fooArrayPtr := (*unsafe.Pointer)(&fooArray)
+	// cResults
+	cResults := C.malloc(C.size_t(f.ptr.funcType.numRets) * C.size_t(unsafe.Sizeof(uintptr(0))))
+	cResultsPtr := (*unsafe.Pointer)(&cResults)
 
-	result = C.m3_GetResults(f.Ptr(), C.uint(f.ptr.funcType.numRets), fooArrayPtr)
+	// get results
+	result = C.m3_GetResults(f.Ptr(), C.uint(f.ptr.funcType.numRets), cResultsPtr)
 	if result != nil {
 		return nil, errors.New("error when getting result")
 	}
 
-	d := (*[1<<30 - 1]unsafe.Pointer)(unsafe.Pointer(fooArray))[:f.ptr.funcType.numRets:f.ptr.funcType.numRets]
-	rets := make([]interface{}, len(d))
-	for i, x := range d {
+	// parse results
+	cResultsSlice := (*[1<<30 - 1]unsafe.Pointer)(unsafe.Pointer(cResults))[:f.ptr.funcType.numRets:f.ptr.funcType.numRets]
+	iResults := make([]interface{}, len(cResultsSlice))
+	for i, x := range cResultsSlice {
 		t := C.m3_GetRetType(f.ptr, C.uint(i))
+
 		switch t {
 		case C.c_m3Type_none:
-			rets[i] = nil
+			iResults[i] = nil
 		case C.c_m3Type_i32:
 			y := *(*int32)(unsafe.Pointer(&x))
 			w := (interface{})(y)
-			rets[i] = w
+			iResults[i] = w
 		case C.c_m3Type_i64:
 			y := *(*int64)(unsafe.Pointer(&x))
 			w := (interface{})(y)
-			rets[i] = w
+			iResults[i] = w
 		case C.c_m3Type_f32:
 			y := *(*float32)(unsafe.Pointer(&x))
 			w := (interface{})(y)
-			rets[i] = w
+			iResults[i] = w
 		case C.c_m3Type_f64:
 			y := *(*float64)(unsafe.Pointer(&x))
 			w := (interface{})(y)
-			rets[i] = w
+			iResults[i] = w
 		default:
-			rets[i] = nil
+			iResults[i] = nil
 		}
 	}
 
-	return rets, nil
+	return iResults, nil
 }
