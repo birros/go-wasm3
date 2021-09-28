@@ -1,0 +1,75 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 92ba950..441bfbc 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,13 +16,14 @@ if(NOT CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "set build type to Release")
+ endif()
+ 
+-if(WASIENV)
+-  set(BUILD_WASI "metawasi" CACHE STRING "WASI implementation")
+-elseif(EMSCRIPTEN OR EMSCRIPTEN_LIB)
+-  set(BUILD_WASI "none" CACHE STRING "WASI implementation")
+-else()
+-  set(BUILD_WASI "uvwasi" CACHE STRING "WASI implementation")
+-endif()
++# if(WASIENV)
++#   set(BUILD_WASI "metawasi" CACHE STRING "WASI implementation")
++# elseif(EMSCRIPTEN OR EMSCRIPTEN_LIB)
++#   set(BUILD_WASI "none" CACHE STRING "WASI implementation")
++# else()
++#   set(BUILD_WASI "uvwasi" CACHE STRING "WASI implementation")
++# endif()
++set(BUILD_WASI "simple" CACHE STRING "WASI implementation")
+ set_property(CACHE BUILD_WASI PROPERTY STRINGS none simple uvwasi metawasi)
+ 
+ option(BUILD_NATIVE "Build with machine-specific optimisations" ON)
+@@ -96,7 +97,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
+ 
+ 
+ file(GLOB app_srcs "${APP_DIR}/*.c")
+-add_executable(${OUT_FILE} ${app_srcs})
++# add_executable(${OUT_FILE} ${app_srcs})
+ 
+ #-fno-optimize-sibling-calls
+ 
+@@ -172,14 +173,14 @@ else()
+     if(APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+       set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mcpu=native")
+     else()
+-      set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
++      set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+     endif()
+   endif()
+ 
+   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-O0")
+   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-O3")
+ 
+-  target_link_libraries(${OUT_FILE} m)
++  # target_link_libraries(${OUT_FILE} m)
+ 
+ endif()
+ 
+@@ -202,19 +203,19 @@ elseif(BUILD_WASI MATCHES "uvwasi")
+     add_subdirectory(${uvwasi_SOURCE_DIR} ${uvwasi_BINARY_DIR} EXCLUDE_FROM_ALL)
+   endif()
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dd_m3HasUVWASI")
+-  target_link_libraries(${OUT_FILE} uvwasi_a uv_a)
++  # target_link_libraries(${OUT_FILE} uvwasi_a uv_a)
+ endif()
+ 
+ check_ipo_supported(RESULT result)
+ if(result AND NOT WASIENV) # TODO: LTO breaks wasm imports
+-  set_property(TARGET ${OUT_FILE} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
++  # set_property(TARGET ${OUT_FILE} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+   message("LTO:        ON")
+ else()
+   message("LTO:        OFF")
+ endif()
+ 
+ add_subdirectory(source)
+-target_link_libraries(${OUT_FILE} m3)
++# target_link_libraries(${OUT_FILE} m3)
+ 
+ message("Flags:         ${CMAKE_C_FLAGS}")
+ message("Debug flags:   ${CMAKE_C_FLAGS_DEBUG}")
