@@ -12,9 +12,9 @@ build/bin: ${GO_FILES} kernel/lib.wasm
 build/ios/arm64/Kernel.framework: ${GO_FILES} kernel/lib.wasm
 	gomobile bind -target ios/arm64 -o build/ios/arm64/Kernel.framework github.com/birros/go-wasm3/examples/sum/kernel
 
-build/kernel-arm64.aar: ${GO_FILES} kernel/lib.wasm
-	mkdir -p build
-	gomobile bind -target android/arm64 -androidapi 28 -o build/kernel-arm64.aar github.com/birros/go-wasm3/examples/sum/kernel
+build/android/arm64/kernel.aar: ${GO_FILES} kernel/lib.wasm
+	mkdir -p build/android/arm64
+	gomobile bind -target android/arm64 -androidapi 28 -o build/android/arm64/kernel.aar github.com/birros/go-wasm3/examples/sum/kernel
 
 kernel/lib.wasm: ${LIB_FILES}
 	tinygo build -o kernel/lib.wasm -target wasm lib/sum.go
