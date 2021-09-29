@@ -9,8 +9,8 @@ run: build/bin
 build/bin: ${GO_FILES} kernel/lib.wasm
 	go build -o build/bin main.go
 
-build/Kernel-arm64.framework: ${GO_FILES} kernel/lib.wasm
-	gomobile bind -target ios/arm64 -o build/Kernel-arm64.framework github.com/birros/go-wasm3/examples/sum/kernel
+build/ios/arm64/Kernel.framework: ${GO_FILES} kernel/lib.wasm
+	gomobile bind -target ios/arm64 -o build/ios/arm64/Kernel.framework github.com/birros/go-wasm3/examples/sum/kernel
 
 build/kernel-arm64.aar: ${GO_FILES} kernel/lib.wasm
 	mkdir -p build
