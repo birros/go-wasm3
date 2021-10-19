@@ -5,6 +5,18 @@ build/wasm3:
 build/ios-cmake:
 	git clone https://github.com/leetal/ios-cmake.git --branch 4.2.0 --depth 1 build/ios-cmake && rm -rf build/ios-cmake/.git
 
+build/dockcross-windows-static-x64:
+	mkdir -p build
+	docker run --rm dockcross/windows-static-x64:20211018-b3b207e > build/dockcross-windows-static-x64
+	chmod +x build/dockcross-windows-static-x64
+
+lib/windows/amd64/libm3.a: build/wasm3 build/dockcross-windows-static-x64
+	mkdir -p build/wasm3/build-windows-amd64
+	cd build/wasm3 && ../dockcross-windows-static-x64 cmake -B build-windows-amd64
+	cd build/wasm3 && ../dockcross-windows-static-x64 make -C build-windows-amd64
+	mkdir -p lib/windows/amd64
+	cp build/wasm3/build-windows-amd64/source/libm3.a lib/windows/amd64/libm3.a
+
 lib/macos/amd64/libm3.a: build/wasm3
 	mkdir -p build/wasm3/build-macos-amd64
 	cd build/wasm3/build-macos-amd64 && cmake .. && make
