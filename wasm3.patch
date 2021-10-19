@@ -73,3 +73,21 @@ index 92ba950..441bfbc 100755
  
  message("Flags:         ${CMAKE_C_FLAGS}")
  message("Debug flags:   ${CMAKE_C_FLAGS_DEBUG}")
+diff --git a/source/m3_api_wasi.c b/source/m3_api_wasi.c
+index 47cccff..88012cb 100644
+--- a/source/m3_api_wasi.c
++++ b/source/m3_api_wasi.c
+@@ -48,11 +48,11 @@
+ #  endif
+ #  define HAS_IOVEC
+ #elif defined(_WIN32)
+-#  include <Windows.h>
++#  include <windows.h>
+ #  include <io.h>
+ // See http://msdn.microsoft.com/en-us/library/windows/desktop/aa387694.aspx
+ #  define SystemFunction036 NTAPI SystemFunction036
+-#  include <NTSecAPI.h>
++#  include <ntsecapi.h>
+ #  undef SystemFunction036
+ #  define ssize_t SSIZE_T
+ 
