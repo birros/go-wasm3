@@ -7,6 +7,7 @@ package wasm3
 #cgo android,arm64 LDFLAGS: -L${SRCDIR}/lib/android/arm64 -lm3 -lm
 #cgo linux,!android,amd64 LDFLAGS: -L${SRCDIR}/lib/linux/amd64 -lm3 -lm
 #cgo linux,!android,arm64 LDFLAGS: -L${SRCDIR}/lib/linux/arm64 -lm3 -lm
+#cgo windows,amd64 LDFLAGS: -L${SRCDIR}/lib/windows/amd64 -lm3 -lm
 
 #include "wasm3.h"
 #include "m3_api_libc.h"
