@@ -17,7 +17,6 @@ import "C"
 
 import (
 	"errors"
-	"math"
 	"unsafe"
 )
 
@@ -35,7 +34,7 @@ func (f *Function) Call(args ...interface{}) ([](interface{}), error) {
 
 	// cArgs
 	cArgs := C.malloc(C.size_t(argsLength) * C.size_t(unsafe.Sizeof(uintptr(0))))
-	cArgsSlice := (*[math.MaxUint16]unsafe.Pointer)(cArgs)[:argsLength:argsLength]
+	cArgsSlice := cArrayToSlice(cArgs, argsLength)
 	for i, v := range args {
 		cArgsSlice[i] = nil
 
@@ -79,7 +78,8 @@ func (f *Function) Call(args ...interface{}) ([](interface{}), error) {
 	}
 
 	// parse results
-	cResultsSlice := (*[math.MaxUint16]unsafe.Pointer)(unsafe.Pointer(cResults))[:f.ptr.funcType.numRets:f.ptr.funcType.numRets]
+	resultsLength := (int)(f.ptr.funcType.numRets)
+	cResultsSlice := cArrayToSlice(cResults, resultsLength)
 	iResults := make([]interface{}, len(cResultsSlice))
 	for i, x := range cResultsSlice {
 		t := C.m3_GetRetType(f.ptr, C.uint(i))
