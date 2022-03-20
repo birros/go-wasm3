@@ -1,8 +1,16 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 92ba950..441bfbc 100755
+index 92ba950..66f4231 100755
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -16,13 +16,14 @@ if(NOT CMAKE_BUILD_TYPE)
+@@ -1,5 +1,7 @@
+ cmake_minimum_required(VERSION 3.11)
+ 
++set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS} -fPIE")
++
+ # Detect WasiEnv
+ if(DEFINED ENV{WASI_CC})
+   set(WASIENV           1)
+@@ -16,13 +18,14 @@ if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "set build type to Release")
  endif()
  
@@ -24,7 +32,7 @@ index 92ba950..441bfbc 100755
  set_property(CACHE BUILD_WASI PROPERTY STRINGS none simple uvwasi metawasi)
  
  option(BUILD_NATIVE "Build with machine-specific optimisations" ON)
-@@ -96,7 +97,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
+@@ -96,7 +99,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
  
  
  file(GLOB app_srcs "${APP_DIR}/*.c")
@@ -33,7 +41,7 @@ index 92ba950..441bfbc 100755
  
  #-fno-optimize-sibling-calls
  
-@@ -172,14 +173,14 @@ else()
+@@ -172,14 +175,14 @@ else()
      if(APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mcpu=native")
      else()
@@ -50,7 +58,7 @@ index 92ba950..441bfbc 100755
  
  endif()
  
-@@ -202,19 +203,19 @@ elseif(BUILD_WASI MATCHES "uvwasi")
+@@ -202,19 +205,19 @@ elseif(BUILD_WASI MATCHES "uvwasi")
      add_subdirectory(${uvwasi_SOURCE_DIR} ${uvwasi_BINARY_DIR} EXCLUDE_FROM_ALL)
    endif()
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dd_m3HasUVWASI")

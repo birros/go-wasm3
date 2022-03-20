@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index e8ce86b..f661a6f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -211,7 +211,7 @@ $(VERBOSE).SILENT: display_images
+ # build implicit rule
+ #
+ 
+-$(STANDARD_IMAGES): %: %/Dockerfile base
++$(STANDARD_IMAGES): %: %/Dockerfile
+ 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
+ 	$(DOCKER) build -t $(ORG)/$@:latest \
+ 		-t $(ORG)/$@:$(TAG) \

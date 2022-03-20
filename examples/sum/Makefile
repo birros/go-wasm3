@@ -9,12 +9,16 @@ run: build/bin
 build/bin: ${GO_FILES} kernel/lib.wasm
 	go build -o build/bin main.go
 
-build/ios/arm64/Kernel.framework: ${GO_FILES} kernel/lib.wasm
-	gomobile bind -target ios/arm64 -o build/ios/arm64/Kernel.framework github.com/birros/go-wasm3/examples/sum/kernel
+build/ios/arm64/Kernel.xcframework: ${GO_FILES} kernel/lib.wasm
+	gomobile bind -target ios/arm64 -o build/ios/arm64/Kernel.xcframework github.com/birros/go-wasm3/examples/sum/kernel
 
 build/android/arm64/kernel.aar: ${GO_FILES} kernel/lib.wasm
 	mkdir -p build/android/arm64
 	gomobile bind -target android/arm64 -androidapi 28 -o build/android/arm64/kernel.aar github.com/birros/go-wasm3/examples/sum/kernel
 
 kernel/lib.wasm: ${LIB_FILES}
-	tinygo build -o kernel/lib.wasm -target wasm lib/sum.go
+	GOROOT=$(shell go env GOROOT) tinygo build -o kernel/lib.wasm -target wasm lib/sum.go
+
+.PHONY: clean
+clean:
+	rm -rf build
