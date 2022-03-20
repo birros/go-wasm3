@@ -14,4 +14,13 @@ $ asdf plugin add tinygo https://github.com/schmir/asdf-tinygo.git
 
 ## Related projects
 
-- https://github.com/matiasinsaurralde/go-wasm3
+- Strongly inspired by [go-wasm3][1], even though I wrote this binding from
+  scratch
+- If you are looking for a webassembly runtime that can be used in go, check out
+  [wazero][2] instead, which does not depend on any CGO library, making it much
+  more relevant for use with gomobile
+
+<!-- links -->
+
+[1]: https://github.com/matiasinsaurralde/go-wasm3
+[2]: https://github.com/tetratelabs/wazero
